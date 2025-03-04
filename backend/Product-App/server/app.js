@@ -36,8 +36,8 @@ app.post("/product",(req,res)=>{
         res.status(400).json({status: "fail",message: "All fields required"});
     }
     else{
-        // const newId=products.length>0 ? (products[products.length-1].id+1) :10
-        const newId=Math.floor((Math.random()*900000)+100000);
+        const newId=products.length>0 ? (products[products.length-1].id+1) :10
+        // const newId=Math.floor((Math.random()*900000)+100000);
         const newProduct={
             id: newId,title,brand,price,quantity
         }
