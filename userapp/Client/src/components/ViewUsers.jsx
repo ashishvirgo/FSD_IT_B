@@ -19,10 +19,21 @@ const ViewUsers = () => {
             setError(err.message);
         }
     }
+    const handleDelete=(email)=>{
+        try{
+            axios.delete(`https://userapp6.onrender.com/removeuser/${email}`)
+            alert("user deleted successfully");
+            fetchUsers();
+        }
+        catch(err){
+            console.log("deleting error",err.message)
+            setError(err.message);
+        }
+    }
   return (
     <div className='content'>
       <h1>List of Users</h1>
-      <table>
+      <table className='table table-hover'>
         <thead>
             <tr>
                 <th>Sr.No.</th>
@@ -41,7 +52,7 @@ const ViewUsers = () => {
             <td>{user.role}</td>
             <td>
                 <button>Edit</button>&nbsp;
-                <button>Delete</button>
+                <button onClick={()=>handleDelete(user.email)}>Delete</button>
             </td>
            </tr> 
         ))}

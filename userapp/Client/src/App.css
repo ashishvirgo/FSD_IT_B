@@ -18,4 +18,5 @@
   background-color: gainsboro;
   color: black;
   text-align: center;
+  overflow-y:scroll;
 }
