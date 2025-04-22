@@ -4,6 +4,11 @@ import { useState,useEffect } from 'react';
 const ViewUsers = () => {
     const [users,setUsers]=useState([]);
     const [error,setError]=useState(null);
+    const [newUser, setNewUser] = useState({
+        name: '',
+        email: '',
+        role: 'student'
+    });
     
     useEffect(()=>{
         fetchUsers();
@@ -26,7 +31,19 @@ const ViewUsers = () => {
             fetchUsers();
         }
         catch(err){
-            console.log("deleting error",err.message)
+            console.log("user deleting error",err.message)
+            setError(err.message);
+        }
+    }
+    const handleAdd=async()=>{
+        try{
+            await axios.post(`https://userapp6.onrender.com/adduser`,newUser)
+            alert("user added successfully");
+            setNewUser({name: '',email:'',role: 'student'})
+            fetchUsers();
+        }
+        catch(err){
+            console.log("user creation error",err.message)
             setError(err.message);
         }
     }
@@ -44,15 +61,36 @@ const ViewUsers = () => {
             </tr>
         </thead>
         <tbody>
-        {error || users.map((user,index)=>(
+        <tr>
+            <td>#</td>
+            <td><input type="text" 
+            placeholder="Enter Name of User" 
+            value={newUser.name}
+            onChange={(e) => setNewUser({ ...newUser, name: e.target.value })}/></td>
+            <td><input type="email" 
+            placeholder="Enter User Email"
+            value={newUser.email}
+            onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}/></td>
+            <td><select value={newUser.role}
+  onChange={(e) => setNewUser({ ...newUser, role: e.target.value })}>
+                <option value="admin">Admin</option>
+                <option value="teacher">Teacher</option>
+                <option value="student">Student</option></select></td>
+            <td>
+                <button className='btn btn-primary' onClick={(e)=>handleAdd(e)}>Add User</button>
+                
+            </td>
+           </tr>  
+        {error && <tr><td colSpan="5" className="text-danger">{error}</td></tr>} 
+        {users.map((user,index)=>(
            <tr>
             <td>{++index}</td>
             <td>{user.name}</td>
             <td>{user.email}</td>
             <td>{user.role}</td>
             <td>
-                <button>Edit</button>&nbsp;
-                <button onClick={()=>handleDelete(user.email)}>Delete</button>
+                <button className='btn btn-primary'>Edit</button>&nbsp;
+                <button className='btn btn-danger' onClick={()=>handleDelete(user.email)}>Delete</button>
             </td>
            </tr> 
         ))}
