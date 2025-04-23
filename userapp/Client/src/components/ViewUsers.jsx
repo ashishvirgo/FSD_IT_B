@@ -4,6 +4,8 @@ import { useState,useEffect } from 'react';
 const ViewUsers = () => {
     const [users,setUsers]=useState([]);
     const [error,setError]=useState(null);
+    const [editemail,setEditemail]=useState(null);
+    const [edituser,setEdituser]=useState({name:'',role:''})
     const [newUser, setNewUser] = useState({
         name: '',
         email: '',
@@ -47,15 +49,34 @@ const ViewUsers = () => {
             setError(err.message);
         }
     }
+    const handleEdit=(email)=>{
+              setEditemail(email);
+    }
+    const handleCancel=()=>{
+        setEditemail(null);
+    }
+    const handleSave=async(email)=>{
+        try{
+            await axios.put(`https://userapp6.onrender.com/updateuser/${email}`,edituser)
+            alert("user edited successfully");
+            setEditemail(null);
+            setEdituser({name: '',role:''});
+            fetchUsers();
+        }
+        catch(err){
+            console.log("user editing error",err.message)
+            setError(err.message);
+        }
+    }
   return (
     <div className='content'>
-      <h1>List of Users</h1>
+      <h3>List of Users</h3>
       <table className='table table-hover'>
         <thead>
             <tr>
                 <th>Sr.No.</th>
-                <th>User Name</th>
                 <th>User Email</th>
+                <th>User Name</th>
                 <th>User Role</th>
                 <th>Action</th>
             </tr>
@@ -63,14 +84,14 @@ const ViewUsers = () => {
         <tbody>
         <tr>
             <td>#</td>
-            <td><input type="text" 
-            placeholder="Enter Name of User" 
-            value={newUser.name}
-            onChange={(e) => setNewUser({ ...newUser, name: e.target.value })}/></td>
             <td><input type="email" 
-            placeholder="Enter User Email"
+            placeholder="Enter User Email" 
             value={newUser.email}
             onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}/></td>
+            <td><input type="text" 
+            placeholder="Enter Name of User"
+            value={newUser.name}
+            onChange={(e) => setNewUser({ ...newUser, name: e.target.value })}/></td>
             <td><select value={newUser.role}
   onChange={(e) => setNewUser({ ...newUser, role: e.target.value })}>
                 <option value="admin">Admin</option>
@@ -85,12 +106,21 @@ const ViewUsers = () => {
         {users.map((user,index)=>(
            <tr>
             <td>{++index}</td>
-            <td>{user.name}</td>
             <td>{user.email}</td>
-            <td>{user.role}</td>
-            <td>
-                <button className='btn btn-primary'>Edit</button>&nbsp;
-                <button className='btn btn-danger' onClick={()=>handleDelete(user.email)}>Delete</button>
+            <td>{editemail===user.email?<input type="text" 
+            placeholder="Enter Name of User" 
+            value={edituser.name}
+            onChange={(e) => setEdituser({ ...edituser, name: e.target.value })}/>:(user.name)}</td>
+            <td>{editemail===user.email?(<select value={edituser.role}
+  onChange={(e) => setEdituser({ ...edituser, role: e.target.value })}>
+                <option value="admin">Admin</option>
+                <option value="teacher">Teacher</option>
+                <option value="student">Student</option></select>): user.role}</td>
+            <td>{editemail===user.email ? (<><button className='btn btn-success'onClick={()=>handleSave(user.email)}>Save</button>&nbsp;
+                <button className='btn btn-danger' onClick={()=>handleCancel()}>Cancel</button></>):
+                (<><button className='btn btn-success'onClick={()=>handleEdit(user.email)}>Edit</button>&nbsp;
+                <button className='btn btn-danger' onClick={()=>handleDelete(user.email)}>Delete</button></>)
+                }
             </td>
            </tr> 
         ))}
