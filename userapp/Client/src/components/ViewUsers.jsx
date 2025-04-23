@@ -23,10 +23,12 @@ const ViewUsers = () => {
         }
         catch(err){
             console.log("users Fetching Error",err.message);
-            setError(err.message);
+            setError('Failed to fetch user. Please try again.');
         }
     }
     const handleDelete=(email)=>{
+        const confirmed = window.confirm("Are you sure you want to delete this user?");
+        if (confirmed) {
         try{
             axios.delete(`https://userapp6.onrender.com/removeuser/${email}`)
             alert("user deleted successfully");
@@ -34,22 +36,36 @@ const ViewUsers = () => {
         }
         catch(err){
             console.log("user deleting error",err.message)
-            setError(err.message);
+            setError('Failed to delete user. Please try again.');
         }
     }
+    else{
+        console.log("cancel user deletion")
+    }
+    }
     const handleAdd=async()=>{
+        if (!newUser.name || !newUser.email) {
+            setError('Name and Email are required.');
+            return;
+        }
         try{
             await axios.post(`https://userapp6.onrender.com/adduser`,newUser)
             alert("user added successfully");
             setNewUser({name: '',email:'',role: 'student'})
+            setError(null);
             fetchUsers();
+            
         }
         catch(err){
             console.log("user creation error",err.message)
-            setError(err.message);
+            setError('Failed to add user. Please try again.');
         }
     }
     const handleEdit=(email)=>{
+        const userToEdit = users.find((user) => user.email === email);
+    if (userToEdit) {
+      setEdituser({ name: userToEdit.name, role: userToEdit.role });
+    }
               setEditemail(email);
     }
     const handleCancel=()=>{
@@ -65,7 +81,7 @@ const ViewUsers = () => {
         }
         catch(err){
             console.log("user editing error",err.message)
-            setError(err.message);
+            setError('Failed to edit user. Please try again.');
         }
     }
   return (
@@ -115,7 +131,7 @@ const ViewUsers = () => {
   onChange={(e) => setEdituser({ ...edituser, role: e.target.value })}>
                 <option value="admin">Admin</option>
                 <option value="teacher">Teacher</option>
-                <option value="student">Student</option></select>): user.role}</td>
+                <option value="student">Student</option></select>): (user.role)}</td>
             <td>{editemail===user.email ? (<><button className='btn btn-success'onClick={()=>handleSave(user.email)}>Save</button>&nbsp;
                 <button className='btn btn-danger' onClick={()=>handleCancel()}>Cancel</button></>):
                 (<><button className='btn btn-success'onClick={()=>handleEdit(user.email)}>Edit</button>&nbsp;
